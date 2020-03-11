@@ -21,7 +21,7 @@ def send(event, context, responseStatus, responseData, physicalResourceId=None, 
     responseBody['Status'] = responseStatus
     responseBody['StackId'] = event['StackId']
     #comment below two lines for testing as we will not get actual resource id from context 
-	responseBody['Reason'] = 'See the details in CloudWatch Log Stream: ' + context.log_stream_name
+    responseBody['Reason'] = 'See the details in CloudWatch Log Stream: ' + context.log_stream_name
     responseBody['PhysicalResourceId'] = physicalResourceId or context.log_stream_name
     responseBody['RequestId'] = event['RequestId']
     responseBody['LogicalResourceId'] = event['LogicalResourceId']
