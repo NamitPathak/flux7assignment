@@ -1,0 +1,141 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  BucketName: 
+    Type: String
+    Description: "S3 bucket name"
+    MinLength: 1
+  BucketKeyName:
+    Type: String
+    Description: "S3 Key Name"
+    MinLength: 1
+  statename:
+    Type: String
+    Description: "List of european countries"
+    Default: London 
+    AllowedValues:
+        - Amsterdam
+        - Andorra
+        - Astrakhan
+        - Athens
+        - Belgrade
+        - Berlin
+        - Brussels
+        - Bucharest
+        - Budapest
+        - Chisinau
+        - Copenhagen
+        - Dublin
+        - Gibraltar
+        - Helsinki
+        - Istanbul
+        - Kaliningrad
+        - Kiev
+        - Kirov
+        - Lisbon
+        - London
+        - Luxembourg
+        - Madrid
+        - Malta
+        - Minsk
+        - Monaco
+        - Moscow
+        - Oslo
+        - Paris
+        - Prague
+        - Riga
+        - Rome
+        - Samara
+        - Saratov
+        - Simferopol
+        - Sofia
+        - Stockholm
+        - Tallinn
+        - Tirane
+        - Ulyanovsk
+        - Uzhgorod
+        - Vienna
+        - Vilnius
+        - Volgograd
+        - Warsaw
+        - Zaporozhye
+        - Zurich
+        
+Resources:
+  GetDataFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: !Ref BucketName
+        S3Key: !Ref BucketKeyName
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      Timeout: 60
+      MemorySize : 128
+      Role: !GetAtt IAMRole.Arn
+  IAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+  IAMPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: lambdapolicy
+      Roles:
+        - !Ref IAMRole
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Action:
+              - "*"
+            Resource:
+              - "*"
+  CallOutLambda:
+    Type: Custom::CallOutLambda
+    Properties :
+      ServiceToken: !GetAtt GetDataFunction.Arn
+      statename : !Ref statename
+
+Outputs:
+  abbreviation:
+    Description: "abbreviation"
+    Value: !GetAtt CallOutLambda.abbreviation
+  datetime:
+    Description: "datetime"
+    Value: !GetAtt CallOutLambda.datetime
+  dayofweek:
+    Description: "day_of_week"
+    Value: !GetAtt CallOutLambda.day_of_week
+  dayofyear:
+    Description: "day_of_year"
+    Value: !GetAtt CallOutLambda.day_of_year
+  dst:
+    Description: "dst"
+    Value: !GetAtt CallOutLambda.dst
+  dstfrom:
+    Description: "dst_from"
+    Value: !GetAtt CallOutLambda.dst_from
+  dstuntil:
+    Description: "dst_until"
+    Value: !GetAtt CallOutLambda.dst_until
+  timezone:
+    Description: "timezone"
+    Value: !GetAtt CallOutLambda.timezone
+  unixtime:
+    Description: "unixtime"
+    Value: !GetAtt CallOutLambda.unixtime
+  utcoffset:
+    Description: "utc_offset"
+    Value: !GetAtt CallOutLambda.utc_offset
+  
